@@ -1,0 +1,10 @@
+form a {
+    margin-left: 15px;
+}
+
+@media (min-width: 992px){
+    .navbar-nav > li {
+        margin-left : 1em;
+        margin-right : 1em;
+    }
+}
