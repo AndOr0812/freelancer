@@ -1,5 +1,6 @@
 {
   "name": "freelancer_application",
+  "author":"Akhil Bhavirisetty",
   "version": "1.0.0",
   "description": "This application is developed using Redux with React and Babel support",
   "main": "index.js",
