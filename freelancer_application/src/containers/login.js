@@ -3,6 +3,14 @@ import {Field, reduxForm} from 'redux-form';
 import {Link} from 'react-router-dom';
 import {connect} from "react-redux";
 import {authenticateUser} from "../actions";
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
+
+
+import Signup from './signup';
+
+import Modal from '../components/modal';
+import Profile from "../components/profile";
+import App from "../components/app";
 
 class Login extends Component {
     renderField(field){
@@ -64,6 +72,11 @@ class Login extends Component {
                 <button type='submit' className='btn btn-primary'>Submit</button>
                 <Link to='/' className='btn btn-danger'>Cancel</Link>
             </form>
+                <Modal>
+                    <BrowserRouter>
+                        <Signup />
+                    </BrowserRouter>
+                </Modal>
             </div>
         );
     }
