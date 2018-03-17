@@ -13,11 +13,22 @@ module.exports = function (sequelize, DataTypes) {
     bid_status: {
       type: DataTypes.STRING(30)
     }
+  }, {
+    indexes: [// Creating Composite unique index on project id and bidder(user emailid)
+    {
+      unique: true,
+      fields: ['ProjectId', 'Bidder']
+    }]
   });
 
   ProjectBid.associate = function (models) {
     ProjectBid.belongsTo(models.User, {
       foreignKey: 'Bidder',
+      onDelete: 'SET NULL'
+    });
+    ProjectBid.belongsTo(models.Project, {
+      foreignKey: 'EmployerID',
+      targetKey: 'Employer',
       onDelete: 'SET NULL'
     });
     ProjectBid.belongsTo(models.Project, {

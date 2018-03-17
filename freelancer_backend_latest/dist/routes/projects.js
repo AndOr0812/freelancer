@@ -54,12 +54,10 @@ router.post('/new', function (req, res) {
   var Employer = req.body.Employer;
   var budget_currency = req.body.budget_currency;
   var budget_range = req.body.budget_range;
-  /*const skills = JSON.parse(req.body.skills);*/
-
-  var skills = req.body.skills.split(",");
+  var skills = req.body.skills;
   console.log("Skills are ".concat(skills));
 
-  if (proj_name === undefined || proj_desc === undefined || Employer === undefined || budget_currency === undefined || budget_range === undefined || skills.length === 0) {
+  if (proj_name === undefined || proj_desc === undefined || Employer === undefined || budget_currency === undefined || budget_range === undefined || skills === undefined) {
     res.status(200).send({
       success: false,
       error: "Please submit the required fields"
@@ -71,6 +69,7 @@ router.post('/new', function (req, res) {
     proj_name: proj_name,
     proj_desc: proj_desc,
     Employer: Employer,
+    skills: skills,
     budget_currency: budget_currency,
     budget_range: budget_range
   }).then(function (project) {
@@ -83,6 +82,7 @@ router.post('/new', function (req, res) {
         name: project.proj_name,
         desc: project.proj_desc,
         employer: project.Employer,
+        skills: project.skills,
         budget_currency: project.budget_currency,
         budget_range: project.budget_range
       }

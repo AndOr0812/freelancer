@@ -18,6 +18,10 @@ module.exports = function (sequelize, DataTypes) {
         msg: "Description should be of length 100 to 1000 chars"
       }
     },
+    skills: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     budget_currency: {
       type: DataTypes.STRING(3),
       allowNull: false
@@ -35,6 +39,11 @@ module.exports = function (sequelize, DataTypes) {
     });
     Project.hasMany(models.ProjectBid, {
       foreignKey: 'ProjectId',
+      onDelete: 'SET NULL'
+    });
+    Project.hasMany(models.ProjectBid, {
+      foreignKey: 'EmployerID',
+      sourceKey: 'Employer',
       onDelete: 'SET NULL'
     });
   };

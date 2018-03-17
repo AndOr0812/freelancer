@@ -1,8 +1,5 @@
 'use strict';
 
-import models from '../models';
-
-
 module.exports = (sequelize, DataTypes) => {
     var User = sequelize.define('User', {
         name: DataTypes.STRING(30),
@@ -20,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'Bidder',
             onDelete: 'SET NULL',
         });
-    }
+    };
 
     return User;
 };
