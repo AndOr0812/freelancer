@@ -10,7 +10,7 @@ var path = require('path');
 import index from './routes/index';
 import users from './routes/users';
 import projects from './routes/projects';
-
+import bids from './routes/bids';
 
 let app = express();
 
@@ -44,6 +44,7 @@ app.use((req, res, next) => {
 app.use('/',index);
 app.use('/users',users);
 app.use('/projects',projects);
+app.use('/bids',bids);
 
 app.use((req, res, next) => {
     var err = new Error('Not Found');

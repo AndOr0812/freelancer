@@ -87,8 +87,8 @@ router.post('/new', function (req, res) {
         budget_range: project.budget_range
       }
     });
-  }).catch(function (err) {
-    console.log("There is an error while creating the project, Error is ".concat(err));
+  }).catch(function (error) {
+    console.log("There is an error while creating the project, Error is ".concat(error));
 
     if (error.name === "SequelizeUniqueConstraintError") {
       res.status(200).send({
@@ -98,7 +98,7 @@ router.post('/new', function (req, res) {
       return;
     }
 
-    res.status(400).send({
+    res.status(200).send({
       success: false,
       error: error
     });

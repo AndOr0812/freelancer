@@ -86,7 +86,7 @@ router.post('/new',(req,res) => {
             },
         });
     }).catch(error => {
-        console.log(`There is an error while creating the project, Error is ${err}`);
+        console.log(`There is an error while creating the project, Error is ${error}`);
         if (error.name === "SequelizeUniqueConstraintError") {
             res.status(200).send({
                 success: false,

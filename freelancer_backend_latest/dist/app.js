@@ -14,6 +14,8 @@ var _users = _interopRequireDefault(require("./routes/users"));
 
 var _projects = _interopRequireDefault(require("./routes/projects"));
 
+var _bids = _interopRequireDefault(require("./routes/bids"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var path = require('path'); //var favicon = require('serve-favicon');
@@ -44,6 +46,7 @@ app.use(function (req, res, next) {
 app.use('/', _index.default);
 app.use('/users', _users.default);
 app.use('/projects', _projects.default);
+app.use('/bids', _bids.default);
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;

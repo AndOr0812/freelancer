@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         skills: {type: DataTypes.STRING, allowNull: false},
         budget_currency: {type: DataTypes.STRING(3), allowNull: false},
-        budget_range: {type: DataTypes.STRING(30), allowNull: false}
+        budget_range: {type: DataTypes.STRING(30), allowNull: false},
+        project_status: {type: DataTypes.STRING(15), allowNull: false, defaultValue: "OPEN"}
     });
 
     Project.associate = function (models) {
