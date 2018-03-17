@@ -26,8 +26,23 @@ class SignUp extends Component {
 
     onSubmit(values){
         console.log(values);
-        this.props.createUsers(values,()=>{
-            this.props.history.push('/');
+        this.props.createUsers(values,(data)=>{
+            if (!data.success) {
+                let err_msg = "";
+                if (data.error.name === "SequelizeUniqueConstraintError") {
+                    err_msg = "User with Email ID already Exists";
+                }
+                else if (data.error === 'Please submit the required fields') {
+                    err_msg = "Please submit the required fields"
+                }
+                else {
+                    err_msg = (data.error.name) ? data.error.name : data.error;
+                }
+                document.getElementById("message").innerHTML = err_msg;
+                return;
+            }
+            console.log("In the callback function with no error");
+            this.props.history.push('/login');
         });
     }
 
@@ -74,6 +89,7 @@ class SignUp extends Component {
                 </div>*/}
                 <button type='submit' className='btn btn-primary'>Submit</button>
                 <Link to='/' className='btn btn-danger'>Cancel</Link>
+                <div id="message"></div>
             </form>
         );
     }

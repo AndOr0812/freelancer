@@ -1,23 +1,26 @@
 import express from 'express';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
+import sessions from "client-sessions";
 var path = require('path');
 //var favicon = require('serve-favicon');
 
 
+
 import index from './routes/index';
 import users from './routes/users';
+import projects from './routes/projects';
 
 
 let app = express();
 
-/*db.authenticate()
-    .then(()=> {
-        console.log('Connected to the Database successfully.');
-    })
-    .catch(err=>{
-        console.error("Unable to connect to DB",err);
-    });*/
+
+app.use(sessions({
+    cookieName: 'mySession', // cookie name dictates the key name added to the request object
+    secret: 'askjnd3akjnd78fkjd64nfdad', // should be a large unguessable string
+    duration: 24 * 60 * 60 * 1000, // how long the session will stay valid in ms
+    activeDuration: 1000 * 60 * 5 // if expiresIn < activeDuration, the session will be extended by activeDuration milliseconds
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,7 +32,8 @@ app.use(bodyParser.json());
 
 app.use((req, res, next) => {
 
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+    res.header("Access-Control-Allow-Credentials",true);
 
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
@@ -39,6 +43,7 @@ app.use((req, res, next) => {
 
 app.use('/',index);
 app.use('/users',users);
+app.use('/projects',projects);
 
 app.use((req, res, next) => {
     var err = new Error('Not Found');

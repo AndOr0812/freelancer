@@ -3,16 +3,24 @@ import {Field, reduxForm} from 'redux-form';
 import {Link} from 'react-router-dom';
 import {connect} from "react-redux";
 import {authenticateUser} from "../actions";
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
-
-
-import Signup from './signup';
-
-import Modal from '../components/modal';
-import Profile from "../components/profile";
-import App from "../components/app";
+import { withRouter } from "react-router-dom";
 
 class Login extends Component {
+
+    componentWillMount(){
+        if (JSON.stringify(this.props.current_user) !== "{}"){
+            this.props.history.push('/profile');
+        }
+    }
+
+    componentWillReceiveProps(nextProps){
+        console.log(`Current User Next Props Value is ${nextProps.current_user}`);
+        if (JSON.stringify(nextProps.current_user) !== "{}"){
+            this.props.history.push('/profile');
+        }
+    }
+
+
     renderField(field){
 
         const className=`form-group ${field.meta.touched && field.meta.error ? 'has-danger': ''}`;
@@ -34,17 +42,11 @@ class Login extends Component {
     onSubmit(values){
         console.log(values);
         this.props.authenticateUser(values,(result_user)=>{
-            console.log('return ffrom the callback');
+            console.log('return from the callback');
             console.log(result_user);
-            if (result_user === 'failure'){
-                alert ('invalid username or password');
-                //this.props.history.push('/login');
-            }
-            else{
-                console.log('inside the else');
-            sessionStorage.setItem('name',result_user.name);
-            sessionStorage.setItem('emailid',result_user.emailid);
-            this.props.history.push('/profile');
+            if (result_user.error === 'Invalid Email Id and password'){
+                let err_msg = "Invalid Email ID and/or Password";
+                document.getElementById("message").innerHTML = err_msg;
             }
         });
         }
@@ -71,12 +73,14 @@ class Login extends Component {
                 />
                 <button type='submit' className='btn btn-primary'>Submit</button>
                 <Link to='/' className='btn btn-danger'>Cancel</Link>
+
             </form>
-                <Modal>
+                <div id="message"> </div>
+{/*                <Modal>
                     <BrowserRouter>
                         <Signup />
                     </BrowserRouter>
-                </Modal>
+                </Modal>*/}
             </div>
         );
     }
@@ -92,13 +96,18 @@ function validate(values) {
     if (!values.password){
         errors.password = 'Please Enter the Password'
     }
-
-
     return errors;
 }
+
+const mapStateToProps = state => {
+    return {
+        current_user : state.userProfile
+    }
+};
+
 export default reduxForm({
     validate,
     form: 'LoginForm'
 })(
-    connect(null,{authenticateUser})(Login)
+    withRouter(connect(mapStateToProps,{authenticateUser})(Login))
 );

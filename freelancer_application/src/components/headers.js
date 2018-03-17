@@ -46,9 +46,11 @@ const Headers = () => {
 
             </ul>
             <ul className="navbar-nav">
+                <Link to="/profile" className="nav-link">Welcome</Link>
                 <Link to="/login" className="nav-link">Login</Link>
                 <Link to="/signup" className="nav-link">Sign Up</Link>
-                <Link to="/" id= "post_project_btn" className="btn btn-warning"> Post a Project </Link>
+                <Link to="/logout" className="nav-link">Log Out</Link>
+                <Link to="/post_project" id= "post_project_btn" className="btn btn-warning"> Post a Project </Link>
             </ul>
         </div>
     </nav>
