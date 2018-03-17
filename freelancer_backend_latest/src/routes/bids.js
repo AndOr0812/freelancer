@@ -65,22 +65,44 @@ router.post('/hire/:bidId',(req,res)=>{
     const id = req.params.bidId;
     console.log(`The bid Id that is going to be hired is ${id}`);
 
-    models.ProjectBid.findById({id}).then((bid)=>{
+    models.ProjectBid.findById(id).then((bid)=>{
         console.log(JSON.stringify(bid));
-        cons
-    })
+        if(!bid){
+            res.status(200).send({
+                success: false,
+                message: "No bids found"
+            });
+            return;
+        }
 
-    models.ProjectBid.update(
-        {bid_status: 'hired'},
-        {where:{id}})
-        .then(result => {
-            console.log(JSON.stringify(result));
-                if (result[0]){
+        models.ProjectBid.update(
+            {bid_status: 'hired'},
+            {where:{id}})
+            .then(result => {
+                console.log(JSON.stringify(result));
+                if (result[0]) {
                     //Since Employer now successfully hired a employee, the status of the project also needs to be updated here
-                    models.Project.update()
-                    res.status(200).send({
-                        success: true,
-                        message: "Hired"
+                    models.Project.update(
+                        {project_status: 'HIRED'},
+                        {where: {id: bid.ProjectId}}
+                    ).then(result => {
+                        console.log(JSON.stringify(result));
+                        if (result[0]) {
+                            res.status(200).send({
+                                success: true,
+                                message: "Hired"
+                            });
+                            return;
+                        }
+                        res.status(200).send({
+                            success: false,
+                            message: "no project for the projectID in bid was found"
+                        });
+                    }).catch(error => {
+                        res.status(200).send({
+                            success: false,
+                            error
+                        });
                     });
                 }
                 else {
@@ -89,12 +111,18 @@ router.post('/hire/:bidId',(req,res)=>{
                         message: "no bids are found"
                     });
                 }
-        }).catch(error => {
+            }).catch(error => {
             res.status(200).send({
                 success: false,
                 error
             });
         });
+    }).catch(error => {
+        res.status(200).send({
+            success: false,
+            error
+        })
+    });
     });
 
 router.get('/',(req,res)=>{

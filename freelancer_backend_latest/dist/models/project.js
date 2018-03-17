@@ -25,6 +25,11 @@ module.exports = function (sequelize, DataTypes) {
     budget_range: {
       type: DataTypes.STRING(30),
       allowNull: false
+    },
+    project_status: {
+      type: DataTypes.STRING(15),
+      allowNull: false,
+      defaultValue: "OPEN"
     }
   });
 

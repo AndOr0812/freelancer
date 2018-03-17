@@ -72,26 +72,67 @@ router.post('/hire/:bidId', function (req, res) {
   var id = req.params.bidId;
   console.log("The bid Id that is going to be hired is ".concat(id));
 
-  _models.default.ProjectBid.update({
-    bid_status: 'hired'
-  }, {
-    where: {
-      id: id
-    }
-  }).then(function (result) {
-    console.log(JSON.stringify(result));
+  _models.default.ProjectBid.findById(id).then(function (bid) {
+    console.log(JSON.stringify(bid));
 
-    if (result[0]) {
-      res.status(200).send({
-        success: true,
-        message: "Hired"
-      });
-    } else {
+    if (!bid) {
       res.status(200).send({
         success: false,
-        message: "no bids are found"
+        message: "No bids found"
       });
+      return;
     }
+
+    _models.default.ProjectBid.update({
+      bid_status: 'hired'
+    }, {
+      where: {
+        id: id
+      }
+    }).then(function (result) {
+      console.log(JSON.stringify(result));
+
+      if (result[0]) {
+        //Since Employer now successfully hired a employee, the status of the project also needs to be updated here
+        _models.default.Project.update({
+          project_status: 'HIRED'
+        }, {
+          where: {
+            id: bid.ProjectId
+          }
+        }).then(function (result) {
+          console.log(JSON.stringify(result));
+
+          if (result[0]) {
+            res.status(200).send({
+              success: true,
+              message: "Hired"
+            });
+            return;
+          }
+
+          res.status(200).send({
+            success: false,
+            message: "no project for the projectID in bid was found"
+          });
+        }).catch(function (error) {
+          res.status(200).send({
+            success: false,
+            error: error
+          });
+        });
+      } else {
+        res.status(200).send({
+          success: false,
+          message: "no bids are found"
+        });
+      }
+    }).catch(function (error) {
+      res.status(200).send({
+        success: false,
+        error: error
+      });
+    });
   }).catch(function (error) {
     res.status(200).send({
       success: false,
