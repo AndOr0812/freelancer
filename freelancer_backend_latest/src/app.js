@@ -2,7 +2,7 @@ import express from 'express';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
 import sessions from "client-sessions";
-var cors = require('cors');
+/*var cors = require('cors');*/
 var path = require('path');
 //var favicon = require('serve-favicon');
 
@@ -15,7 +15,7 @@ import files from './routes/files';
 let app = express();
 
 //Enable CORS
-app.use(cors());
+/*app.use(cors());*/
 
 app.use(sessions({
     cookieName: 'mySession', // cookie name dictates the key name added to the request object

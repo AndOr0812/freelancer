@@ -20,14 +20,14 @@ var _files = _interopRequireDefault(require("./routes/files"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var cors = require('cors');
-
+/*var cors = require('cors');*/
 var path = require('path'); //var favicon = require('serve-favicon');
 
 
 var app = (0, _express.default)(); //Enable CORS
 
-app.use(cors());
+/*app.use(cors());*/
+
 app.use((0, _clientSessions.default)({
   cookieName: 'mySession',
   // cookie name dictates the key name added to the request object
@@ -48,7 +48,8 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
-});
+}); //Any routes with /uploads will be handled by this for handling static files
+
 app.use('/uploads/', _express.default.static(path.join('./', 'public', 'uploads')));
 app.use('/', _index.default);
 app.use('/users', _users.default);
