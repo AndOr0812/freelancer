@@ -128,4 +128,51 @@ router.post('/logout', function (req, res) {
     user: previousUser
   });
 });
+router.post('/profiles/update', function (req, res) {
+  console.log(JSON.stringify(req.body));
+  var emailId = req.body.emailId;
+  var phone = req.body.phone;
+  var imgPath = req.body.imgPath;
+  var aboutme = req.body.aboutme;
+  var skills = req.body.skills;
+  console.log("After destructuring");
+  console.log(JSON.stringify(rest));
+  console.log('Inside the profile update router');
+
+  _models.default.UserProfile.upsert({
+    emailId: emailId,
+    phone: phone,
+    imgPath: imgPath,
+    aboutme: aboutme,
+    skills: skills
+  }).then(function (result) {
+    if (result[0]) {
+      _models.default.UserProfile.findOne({
+        where: {
+          emailId: rest.emailId
+        }
+      }).then(function (updated_user_profile) {
+        res.status(200).send({
+          success: true,
+          updated_user_profile: updated_user_profile
+        });
+      }).catch(function (error) {
+        res.status(200).send({
+          success: false,
+          error: error
+        });
+      });
+    } else {
+      res.status(200).send({
+        success: false,
+        message: "User profile not updated"
+      });
+    }
+  }).catch(function (error) {
+    res.status(200).send({
+      success: false,
+      error: error
+    });
+  });
+});
 module.exports = router;

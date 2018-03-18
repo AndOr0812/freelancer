@@ -3,11 +3,13 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {Field, reduxForm} from 'redux-form';
 import {withRouter} from 'react-router-dom';
-import {getImages} from "../actions";
+import {uploadFile,profileUpdate} from "../actions";
 import ImageUpload from './imageupload';
 import Multiselect from 'react-widgets/lib/Multiselect';
 import 'react-widgets/dist/css/react-widgets.css';
 //const  { DOM: { textarea } } = React;
+
+var FILE_PATH="";
 
 class EditUserProfile extends Component{
 
@@ -27,7 +29,7 @@ class EditUserProfile extends Component{
         console.log(JSON.stringify(input));
         return (
         <div className='form-group'>
-                <textarea className="form-control" defaultValue={input.value || rest.existing_aboutme} placeholder="Content" rows="5" cols="50"></textarea>
+                <textarea className="form-control" name = {input.name} defaultValue={input.value || rest.existing_aboutme} placeholder="Content" rows="5" cols="50"></textarea>
             <div>
                 {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
             </div>
@@ -38,7 +40,7 @@ class EditUserProfile extends Component{
     renderField(field){
 
         console.log(JSON.stringify(field));
-        console.log(`Existing value passed is ${field.existing_value}`)
+        console.log(`Existing value passed is ${field.existing_value}`);
 
         const className=`form-group ${field.meta.touched && field.meta.error ? 'has-danger': ''}`;
 
@@ -57,6 +59,47 @@ class EditUserProfile extends Component{
         );
     }
 
+    handleFileUpload = (event) => {
+
+        const payload = new FormData();
+
+        payload.append('mypic', event.target.files[0]);
+
+        console.log("calling the uploadfile dispatcher function");
+        this.props.uploadFile(payload,(filename) => {
+            if(!filename){
+                console.log("There is an error while uploading the image");
+            }
+            else {
+                console.log("Inside the callback function, Uploded File name is");
+                console.log(filename);
+                FILE_PATH='http://localhost:/5000/uploads/'+filename;
+            }
+        });
+    };
+
+    onSubmit(values){
+        values.emailId = this.props.current_user.emailid;
+        console.log("After including the current user emailid")
+        console.log(JSON.stringify(values));
+        if(FILE_PATH !== this.props.current_profile_details.imgPath){
+            values.imgPath = FILE_PATH;
+        }
+        else {
+            values.imgPath = this.props.current_profile_details.imgPath;
+        }
+        console.log("After updating the image Path");
+        console.log(JSON.stringify(values));
+        this.props.profileUpdate(values,(result_user)=>{
+            console.log('return from the callback');
+            console.log(result_user);
+            if (result_user.error === 'Invalid Email Id and password'){
+                let err_msg = "Invalid Email ID and/or Password";
+                document.getElementById("message").innerHTML = err_msg;
+            }
+        });
+    }
+
     render(){
         const {handleSubmit} = this.props;
 
@@ -64,11 +107,11 @@ class EditUserProfile extends Component{
 
                     <div className="row mt-3">
                         <label htmlFor="upload_image">
-                            <input id="upload_image" type="file" style={{visibility: 'hidden'}}/>
+                            <input id="upload_image" type="file" style={{visibility: 'hidden'}} onChange={this.handleFileUpload}/>
                         <ImageUpload/>
                         </label>
                         <div className="col-sm-6">
-                            <form className='form-group'>
+                            <form onSubmit={handleSubmit(this.onSubmit.bind(this))} className='form-group'>
                             <div className="row">
                                 <div className="col-sm-12">
                                     <h4>Name </h4>
@@ -93,7 +136,7 @@ class EditUserProfile extends Component{
                                         hint = 'Phone Number'
                                         type = 'text'
                                         name = "phone"
-                                        existing_value={this.props.current_user.name}
+                                        existing_value={this.props.current_profile_details.phone}
                                         component = {this.renderField}
                                     />
                                 </div>
@@ -106,7 +149,7 @@ class EditUserProfile extends Component{
                                 <div className="col-sm-12">
                                     <Field
                                         name="aboutme"
-                                        existing_aboutme={this.props.current_user.name}
+                                        existing_aboutme={this.props.current_profile_details.aboutme}
                                         component={this.renderTextArea}
                                     />
                                 </div>
@@ -144,15 +187,24 @@ class EditUserProfile extends Component{
 
 function validate(values) {
     //console.log(values);
- /*   const errors = {};
+    const errors = {};
 
-    if (!values.emailid){
-        errors.emailid = 'Please Enter the EmailID'
+    if(values.phone){
+        if(values.phone.length!== 10) {
+            errors.phone = "Must be 10 digits";
+        }
+        else if (!/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(values.phone)) {
+                errors.phone = "Phone number should be either in the form of xxx-xxx-xxxx or  XXX.XXX.XXXX or  XXX XXX XXXX"
+            }
     }
-    if (!values.password){
-        errors.password = 'Please Enter the Password'
+
+    if(!values.name){
+        errors.name = "Name should not be Empty."
+    } else if(values.name.length <2 || values.name.length >30){
+        errors.name="Name should be min 2 chars and max 30 chars";
     }
-    return errors;*/
+
+    return errors;
 }
 
 
@@ -168,5 +220,5 @@ export default reduxForm({
     validate,
     form: 'EditProfileForm'
 })(
-    withRouter(connect(mapStateToProps,{getImages})(EditUserProfile))
+    withRouter(connect(mapStateToProps,{uploadFile,profileUpdate})(EditUserProfile))
 );

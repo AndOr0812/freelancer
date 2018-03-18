@@ -9,6 +9,8 @@ export const LOGOUT_USER = 'logout_user';
 
 export const GET_IMAGES = 'get_images';
 
+export const USER_PROFILE_UPDATE = 'profile_update';
+
 export const GET_PROFILE_DETAILS = 'get_profile_details';
 
 export const POST_PROJECT = 'post_project';
@@ -38,20 +40,61 @@ export function getImages() {
         })};
 }
 
-export function uploadFile(payload) {
+
+export function getUserProfile(emailId) {
+    console.log(`The emailId for which the profile should be fetched is ${emailId}`);
+    const request = axios.post(`${ROOT_URL}/users/profile/getdetails/`)
+}
+//Action Creator for the Login Page
+export function profileUpdate(values,callback) {
+    console.log('inside  user profile update action creator');
+    console.info('profile_update_values',values);
+    //const payload_response_data;
+    const request = axios.post(`${ROOT_URL}/users/profile/update`,values,{withCredentials:true});
+
+    return (dispatch) => {
+        request.then(
+            ({data}) => {
+                console.log("Inside the profile update dispatcher function");
+                console.log(data);
+                callback(data);
+                if (data.success) {
+                    dispatch({
+                        type: USER_PROFILE_UPDATE,
+                        payload: data
+                    });
+                }
+            }
+        )};
+}
+
+
+
+export function uploadFile(payload,callback) {
     console.log("Inside the upload functionality");
     const request = fetch(`${api}/files/upload`, {
         method: 'POST',
-        body: payload
+        body: payload,
+        credentials: 'include',
+        headers: {
+            'Accept': 'application/json, application/xml, text/plain, text/html, *.*'
+        },
     });
 
 
     return (dispatch) => {
         request.then(res => {
-            if (res.status === 204) {
-                getImages();
+            console.info('response',res);
+            res.json().then( data => {
+                console.log(data.filename);
+                if (data.filename !== undefined) {
+                    callback(data.filename);
+                }
+                else {
+                    callback(false);
+                }
             }
-        }).catch(error => {
+            )}).catch(error => {
             console.log("There is an error during Uploading of File");
             return error;
         });
@@ -89,20 +132,6 @@ export function authenticateUser(values,callback) {
     console.log(values);
     //const payload_response_data;
     const request = axios.post(`${ROOT_URL}/users/login`,values,{withCredentials:true});
-/*        .then(
-            ({data}) => {
-                console.log(`The data returned by login api is : ${JSON.stringify(data)}`);
-                callback(data);
-            })
-        .catch(function (error) {
-            console.log(error);
-        });
-
-    return {
-        type: AUTHENTICATE_USER,
-        payload: request
-    };*/
-
 
         return (dispatch) => {
         request.then(

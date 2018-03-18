@@ -124,4 +124,82 @@ router.post('/logout',(req,res)=>{
     });
 });
 
+router.post('/profile/update', (req,res)=> {
+    console.log(JSON.stringify(req.body));
+    const emailId = req.body.emailId;
+    const phone = req.body.phone;
+    const imgPath = req.body.imgPath;
+    const aboutme = req.body.aboutme;
+    const skills = req.body.skills;
+    console.log("After destructuring");
+    console.log(JSON.stringify(rest));
+    console.log('Inside the profile update router');
+    models.UserProfile.upsert({
+            emailId,
+            phone,
+            imgPath,
+            aboutme,
+            skills,
+        },
+    ).then(result => {
+        if (result[0]) {
+
+            models.UserProfile.findOne({
+                where: {emailId: rest.emailId}
+            })
+                .then((updated_user_profile) => {
+                    res.status(200).send({
+                        success: true,
+                        updated_user_profile
+                    });
+                }).catch(error => {
+                res.status(200).send({
+                    success: false,
+                    error
+                });
+            });
+        } else {
+            res.status(200).send({
+                success: false,
+                message: "User profile not updated"
+            });
+        }
+    }).catch(error => {
+        res.status(200).send({
+            success: false,
+            error
+        });
+    });
+});
+
+router.get('/profile/getdetails/:emailId',(req,res)=>{
+    const emailId = req.params.emailId;
+    console.log(`Email Id passed is ${emailId}`);
+    if(emailId === undefined || emailId === null){
+        res.status(200).send({
+            success: false,
+            message: 'Please pass proper emailId of the user'
+        })
+    }
+    models.UserProfile.findOne({
+        where: {emailId: emailId}
+    }).then(user_profile => {
+            if (!user_profile){
+                res.status(200).send({
+                    success: false,
+                    message: `User profile with the passed ${emailId} not found`
+                });
+                return;
+            }
+            res.status(200).send({
+                success: true,
+                user_profile
+            });
+    }).catch(error=>{
+        res.status(200).send({
+            success: false,
+            error
+        });
+    });
+});
 module.exports = router;
