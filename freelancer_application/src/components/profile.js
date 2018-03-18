@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import Headers from './headers';
 import {withRouter} from "react-router-dom";
 import ImageUpload from '../containers/imageupload';
+import EditUserProfile from '../containers/editprofile';
 class Profile extends Component{
 
     componentWillMount(){
@@ -32,6 +33,10 @@ class Profile extends Component{
                 </div>
                 <div>{this.props.history.push("/login")}</div>
                 </div>);
+        }
+        else if (JSON.stringify(this.props.current_profile_details) === '{}'){
+            return (
+            <EditUserProfile />);
         }
         else {
             return (
@@ -78,7 +83,9 @@ class Profile extends Component{
 
 const mapStateToProps = state => {
     return {
-        current_user : state.userProfile
+        current_user : state.userProfile,
+        current_profile_details : state.profileDetails,
+        images: state.images,
     }
 };
 export default withRouter(connect(mapStateToProps)(Profile));

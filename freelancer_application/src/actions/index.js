@@ -9,6 +9,8 @@ export const LOGOUT_USER = 'logout_user';
 
 export const GET_IMAGES = 'get_images';
 
+export const GET_PROFILE_DETAILS = 'get_profile_details';
+
 export const POST_PROJECT = 'post_project';
 
 const ROOT_URL = 'http://localhost:5000';
