@@ -34,6 +34,8 @@
     "file": "^0.2.2",
     "form-data": "^2.3.2",
     "lodash": "^4.17.5",
+    "material-ui": "^1.0.0-beta.10",
+    "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-cookie": "^1.0.5",
     "react-dom": "^16.2.0",

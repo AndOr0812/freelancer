@@ -16,12 +16,18 @@ var _projects = _interopRequireDefault(require("./routes/projects"));
 
 var _bids = _interopRequireDefault(require("./routes/bids"));
 
+var _files = _interopRequireDefault(require("./routes/files"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var cors = require('cors');
 
 var path = require('path'); //var favicon = require('serve-favicon');
 
 
-var app = (0, _express.default)();
+var app = (0, _express.default)(); //Enable CORS
+
+app.use(cors());
 app.use((0, _clientSessions.default)({
   cookieName: 'mySession',
   // cookie name dictates the key name added to the request object
@@ -43,10 +49,12 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+app.use('/uploads/', _express.default.static(path.join('./', 'public', 'uploads')));
 app.use('/', _index.default);
 app.use('/users', _users.default);
 app.use('/projects', _projects.default);
 app.use('/bids', _bids.default);
+app.use('/files', _files.default);
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;

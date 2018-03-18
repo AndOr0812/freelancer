@@ -7,9 +7,59 @@ export const AUTHENTICATE_USER = 'authenticate_user';
 
 export const LOGOUT_USER = 'logout_user';
 
+export const GET_IMAGES = 'get_images';
+
 export const POST_PROJECT = 'post_project';
 
 const ROOT_URL = 'http://localhost:5000';
+
+const api = process.env.REACT_APP_CONTACTS_API_URL || 'http://localhost:5000';
+
+export function getImages() {
+    console.log("Inside the image Fetch action creator");
+    const request= fetch(`${api}/files/`);
+
+    return (dispatch) => {
+        request.then(
+            (res) => {
+                console.log("Inside the image Fetch dispatcher function");
+                console.log(res);
+                if (res) {
+                    dispatch({
+                        type: GET_IMAGES,
+                        payload: res
+                    });
+                }
+            }
+        ).catch(err => {
+            console.info(err);
+        })};
+}
+
+export function uploadFile(payload) {
+    console.log("Inside the upload functionality");
+    const request = fetch(`${api}/files/upload`, {
+        method: 'POST',
+        body: payload
+    });
+
+
+    return (dispatch) => {
+        request.then(res => {
+            if (res.status === 204) {
+                getImages();
+            }
+        }).catch(error => {
+            console.log("There is an error during Uploading of File");
+            return error;
+        });
+        /*
+                return {
+                    type: CREATE_USER,
+                    payload: request
+                };*/
+    };
+}
 
 //Action creator for the SignUp Page
 export function createUsers(values,callback) {

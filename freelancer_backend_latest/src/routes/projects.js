@@ -5,7 +5,7 @@ import models from '../models';
 
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/')
+        cb(null, 'public/')
     },
     filename: function (req, file, cb) {
         console.log("The files received are ");
@@ -16,7 +16,7 @@ let storage = multer.diskStorage({
 
 let upload = multer({ storage: storage }).array('files',5);
 
-router.post('/uploads',(req,res)=> {
+router.post('/public',(req,res)=> {
     console.log("inside the router");
     console.info(req);
     console.info('req body is', req.body);
