@@ -7,10 +7,10 @@ class ImageUpload extends Component {
         return (
             <div className="col-sm-3">
                 <div className="card" style={{width: 15 +"rem"}}>
-                    <img className="card-img-top" src="http://localhost:5000/uploads/mypic-1521332636649.jpeg" alt="Card image cap" />
+                    <img className="card-img-top" src={this.props.current_profile_details.imgPath} alt="Upload Photo" />
                     <div className="card-body">
                         <h6 className="card-title font-weight-bold">{this.props.current_user.emailid}</h6>
-                        <p className="card-text">This is for the phone number.</p>
+                        <p className="card-text">{this.props.current_profile_details.phone}</p>
                     </div>
                 </div>
             </div>
@@ -22,7 +22,7 @@ class ImageUpload extends Component {
 const mapStateToProps = state => {
     return {
         current_user: state.userProfile,
-        images : state.images
+        current_profile_details : state.profileDetails,
     }
 };
 

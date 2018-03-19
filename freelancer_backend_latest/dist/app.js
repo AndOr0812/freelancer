@@ -8,6 +8,8 @@ var _bodyParser = _interopRequireDefault(require("body-parser"));
 
 var _clientSessions = _interopRequireDefault(require("client-sessions"));
 
+var _bcrypt = _interopRequireDefault(require("bcrypt"));
+
 var _index = _interopRequireDefault(require("./routes/index"));
 
 var _users = _interopRequireDefault(require("./routes/users"));
@@ -21,8 +23,7 @@ var _files = _interopRequireDefault(require("./routes/files"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*var cors = require('cors');*/
-var path = require('path'); //var favicon = require('serve-favicon');
-
+var path = require('path');
 
 var app = (0, _express.default)(); //Enable CORS
 

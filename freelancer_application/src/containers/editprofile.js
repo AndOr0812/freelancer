@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {Field, reduxForm} from 'redux-form';
 import {withRouter} from 'react-router-dom';
-import {uploadFile,profileUpdate} from "../actions";
+import {uploadFile,profileUpdate,getUserProfile} from "../actions";
 import ImageUpload from './imageupload';
 import Multiselect from 'react-widgets/lib/Multiselect';
 import 'react-widgets/dist/css/react-widgets.css';
@@ -12,6 +12,15 @@ import 'react-widgets/dist/css/react-widgets.css';
 var FILE_PATH="";
 
 class EditUserProfile extends Component{
+
+    componentWillMount(){
+        if (JSON.stringify(this.props.current_user) === "{}"){
+            this.props.history.push('/login');
+        }
+/*
+        this.props.getUserProfile(this.props.current_user.emailId);
+*/
+        }
 
     renderMultiselect({ input, ...rest }){
         return (<div><Multiselect {...input}
@@ -29,7 +38,7 @@ class EditUserProfile extends Component{
         console.log(JSON.stringify(input));
         return (
         <div className='form-group'>
-                <textarea className="form-control" name = {input.name} defaultValue={input.value || rest.existing_aboutme} placeholder="Content" rows="5" cols="50"></textarea>
+                <textarea className="form-control" {...input} placeholder="Content" rows="5" cols="50"></textarea>
             <div>
                 {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
             </div>
@@ -40,7 +49,6 @@ class EditUserProfile extends Component{
     renderField(field){
 
         console.log(JSON.stringify(field));
-        console.log(`Existing value passed is ${field.existing_value}`);
 
         const className=`form-group ${field.meta.touched && field.meta.error ? 'has-danger': ''}`;
 
@@ -50,7 +58,6 @@ class EditUserProfile extends Component{
                     className='form-control'
                     type = {field.type}
                     placeholder= {field.hint}
-                    defaultValue={field.existing_value}
                 />
                 <div className='text-help'>
                     {field.meta.touched ? field.meta.error : ''}
@@ -73,7 +80,7 @@ class EditUserProfile extends Component{
             else {
                 console.log("Inside the callback function, Uploded File name is");
                 console.log(filename);
-                FILE_PATH='http://localhost:/5000/uploads/'+filename;
+                FILE_PATH='http://localhost:5000/uploads/'+filename;
             }
         });
     };
@@ -101,8 +108,9 @@ class EditUserProfile extends Component{
     }
 
     render(){
-        const {handleSubmit} = this.props;
+        const {handleSubmit, current_profile_details, initialValues } = this.props;
 
+        console.dir(`Initial values are : ${JSON.stringify(initialValues)}`);  // has correct value "myuser"
         return (<div>
 
                     <div className="row mt-3">
@@ -121,7 +129,7 @@ class EditUserProfile extends Component{
                                         hint = 'Name'
                                         type = 'text'
                                         name = "name"
-                                        existing_value={this.props.current_user.name}
+                                        initialValues = {initialValues.name}
                                         component = {this.renderField}
                                     />
                                 </div>
@@ -136,7 +144,7 @@ class EditUserProfile extends Component{
                                         hint = 'Phone Number'
                                         type = 'text'
                                         name = "phone"
-                                        existing_value={this.props.current_profile_details.phone}
+                                        initialValues = {initialValues.phone}
                                         component = {this.renderField}
                                     />
                                 </div>
@@ -149,9 +157,8 @@ class EditUserProfile extends Component{
                                 <div className="col-sm-12">
                                     <Field
                                         name="aboutme"
-                                        existing_aboutme={this.props.current_profile_details.aboutme}
-                                        component={this.renderTextArea}
-                                    />
+                                        component={this.renderTextArea}>
+                                        {current_profile_details.aboutme}</Field>
                                 </div>
                                 {/*<input className='form-control' style={{height: 150+'px'}} type="text" value={this.props.current_profile_details.aboutme}/>*/}
                             </div>
@@ -162,7 +169,7 @@ class EditUserProfile extends Component{
                                 <div className="col-sm-12">
                                     <Field
                                         name="user_skills"
-                                        existing_skills={["MySQL"]}
+                                        existing_skills={initialValues.skills}
                                         component={this.renderMultiselect}
                                         data={[ 'MySQL', 'NodeJS', 'ReactJS', 'Redux'  ]}
                                     />
@@ -177,7 +184,10 @@ class EditUserProfile extends Component{
                             </form>
                         </div>
                         <div className="col-sm-3 mt-3" style={{height: 50 +"rem"}}>
-                            <button className="btn btn-primary btn-block">View Profile</button>
+                            <button className="btn btn-primary btn-block"
+                                    onClick={()=>this.props.history.push('/editprofile')}>
+                                View Profile
+                            </button>
                         </div>
                     </div>
         </div>
@@ -212,13 +222,28 @@ const mapStateToProps=(state)=>{
     return {
         current_user:state.userProfile,
         current_profile_details : state.profileDetails,
-        images: state.images
+        images: state.images,
+        initialValues: {
+            phone: state.profileDetails.phone,
+            name: state.userProfile.name,
+            imgPath: state.profileDetails.imgPath,
+            skills: (state.profileDetails.skills) ? state.profileDetails.skills: [],
+            aboutme: state.profileDetails.aboutme
+        }
     }
 };
 
+/*
 export default reduxForm({
     validate,
     form: 'EditProfileForm'
-})(
+},mapStateToProps)(
     withRouter(connect(mapStateToProps,{uploadFile,profileUpdate})(EditUserProfile))
 );
+*/
+export default withRouter(connect(mapStateToProps,{uploadFile,profileUpdate,getUserProfile})(
+    reduxForm({
+        validate,
+        form: 'EditProfileForm'
+    })
+    (EditUserProfile)));

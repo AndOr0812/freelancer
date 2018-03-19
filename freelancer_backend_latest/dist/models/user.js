@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
       isEmail: true,
       primaryKey: true
     },
-    password: DataTypes.STRING(15),
+    password: DataTypes.STRING,
     typeOfUser: DataTypes.TINYINT(1)
   });
 

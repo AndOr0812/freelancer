@@ -13,6 +13,7 @@ import Login from './containers/login';
 import LogOut from './containers/logout';
 import reducers from './reducers';
 import Profile from "./components/profile";
+import EditProfile from './containers/editprofile';
 import PostProject from "./containers/postproject";
 
 const createStoreWithMiddleware = applyMiddleware(reduxThunk)(createStore);
@@ -25,6 +26,7 @@ ReactDOM.render(
           <Switch>
               {console.log(store.getState())};
               <Route path="/profile" component={Profile}/>
+              <Route path="/editprofile" component={EditProfile}/>
               <Route path="/post_project" component={PostProject}/>
               <Route path="/logout" component={LogOut}/>
               <Route path="/signup" component={SignUp}/>

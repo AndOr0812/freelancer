@@ -1,4 +1,6 @@
 import express from 'express';
+import bcrypt from 'bcrypt';
+
 /*
 var models  = require('../models');
 */
@@ -24,36 +26,46 @@ router.post('/signup',(req,res)=> {
         return;
     }
 
-    models.User.create({
-        name,
-        emailId,
-        password,
-        typeOfUser,
-    }).then((user) => {
-        console.log("After trying to create the user, the returned user details are ");
-        console.log(user);
-        res.status(200).send({
-            success: true,
-            user : {
-                name : user.name,
-                emailid : user.emailId
-            },
-        });
-    })//Error in Sequelize
-        .catch((error) => {
-        console.log(`Error while creating new User ${error}`);
-        if (error.name === "SequelizeUniqueConstraintError") {
+    bcrypt.hash(password, 10, function(err, hash) {
+        if(err){
             res.status(200).send({
                 success: false,
-                error
+                message:"Password encryption failed"
             });
             return;
         }
-        res.status(400).send({
-            success: false,
-            error
-        });
-    });//Error in Request
+        // Store hash in your password DB.
+        models.User.create({
+            name,
+            emailId,
+            password:hash,
+            typeOfUser,
+        }).then((user) => {
+            console.log("After trying to create the user, the returned user details are ");
+            console.log(user);
+            res.status(200).send({
+                success: true,
+                user: {
+                    name: user.name,
+                    emailid: user.emailId
+                },
+            });
+        })//Error in Sequelize
+            .catch((error) => {
+                console.log(`Error while creating new User ${error}`);
+                if (error.name === "SequelizeUniqueConstraintError") {
+                    res.status(200).send({
+                        success: false,
+                        error
+                    });
+                    return;
+                }
+                res.status(400).send({
+                    success: false,
+                    error
+                });
+            });//Error in Request
+    });
 });
 
 
@@ -73,8 +85,7 @@ router.post('/login',(req,res)=>{
 
     models.User.findOne({
         where:{
-            emailId,
-            password
+            emailId
         }
     }).then(user => {
         console.log("User is");
@@ -82,12 +93,22 @@ router.post('/login',(req,res)=>{
         if (!user){
             res.status(200).send({
                 success: false,
-                error:"Invalid Email Id and password",
+                error:"Invalid Email Id",
             });
             return;
         }
 
-        console.log(`Successfully logged in user emailid is ${user.emailId}`);
+        console.log(`User emailid passed is ${user.emailId}`);
+
+        bcrypt.compare(password, user.password).then(function(result) {
+            if(!result){
+                res.status(200).send({
+                    success: false,
+                    error:"Invalid password",
+                });
+                return;
+            }
+
 
         const logged_in_user = {
             isLoggedIn : true,
@@ -101,6 +122,7 @@ router.post('/login',(req,res)=>{
         res.status(200).send({
             success: true,
             user : logged_in_user,
+        });
         });
     })//Error in Sequelize
         .catch(error => {
@@ -130,9 +152,8 @@ router.post('/profile/update', (req,res)=> {
     const phone = req.body.phone;
     const imgPath = req.body.imgPath;
     const aboutme = req.body.aboutme;
-    const skills = req.body.skills;
+    const skills = JSON.stringify(req.body.user_skills);
     console.log("After destructuring");
-    console.log(JSON.stringify(rest));
     console.log('Inside the profile update router');
     models.UserProfile.upsert({
             emailId,
@@ -140,12 +161,12 @@ router.post('/profile/update', (req,res)=> {
             imgPath,
             aboutme,
             skills,
-        },
+        },{where: {emailId: emailId}}
     ).then(result => {
-        if (result[0]) {
-
-            models.UserProfile.findOne({
-                where: {emailId: rest.emailId}
+        if (result) {
+            console.log(`Result is ${result}`);
+/*            models.UserProfile.findOne({
+                where: {emailId: emailId}
             })
                 .then((updated_user_profile) => {
                     res.status(200).send({
@@ -157,7 +178,7 @@ router.post('/profile/update', (req,res)=> {
                     success: false,
                     error
                 });
-            });
+            });*/
         } else {
             res.status(200).send({
                 success: false,
@@ -172,22 +193,24 @@ router.post('/profile/update', (req,res)=> {
     });
 });
 
+//This router is to fetch the details of the user profile
 router.get('/profile/getdetails/:emailId',(req,res)=>{
     const emailId = req.params.emailId;
-    console.log(`Email Id passed is ${emailId}`);
+    console.log("Email Id passed is ");
+    console.log(emailId);
     if(emailId === undefined || emailId === null){
         res.status(200).send({
             success: false,
             message: 'Please pass proper emailId of the user'
-        })
+        });
     }
     models.UserProfile.findOne({
-        where: {emailId: emailId}
-    }).then(user_profile => {
+        where: {
+            emailId}}).then(user_profile => {
             if (!user_profile){
                 res.status(200).send({
                     success: false,
-                    message: `User profile with the passed ${emailId} not found`
+                    message: "User profile with the passed emailId not found"
                 });
                 return;
             }
@@ -195,11 +218,6 @@ router.get('/profile/getdetails/:emailId',(req,res)=>{
                 success: true,
                 user_profile
             });
-    }).catch(error=>{
-        res.status(200).send({
-            success: false,
-            error
-        });
-    });
+            });
 });
 module.exports = router;

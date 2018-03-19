@@ -7,6 +7,7 @@ import {createUsers} from "../actions";
 class SignUp extends Component {
 
     renderField(field){
+        console.log(field);
 
         const className=`form-group ${field.meta.touched && field.meta.error ? 'has-danger': ''}`;
         return (
@@ -17,7 +18,7 @@ class SignUp extends Component {
                     placeholder= {field.hint}
                     {...field.input}
                 />
-                <div className='text-help'>
+                <div className='text-danger'>
                 {field.meta.touched ? field.meta.error : ''}
                 </div>
             </div>
@@ -49,67 +50,90 @@ class SignUp extends Component {
     render(){
         const {handleSubmit} = this.props;
 
-        return (
-            <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
-                <Field
-                    hint = 'Name'
-                    type = 'text'
-                    name = "name"
-                    component = {this.renderField}
-                />
-                <Field
-                    hint = 'Email Address'
-                    type = 'email'
-                    name = "emailid"
-                    component = {this.renderField}
-                />
-                <Field
-                    hint = 'Password'
-                    type = 'password'
-                    name = "password"
-                    component = {this.renderField}
-                />
-      {/*          <div className='btn btn-secondary'>
-                <Field
-                    hint = ''
-                    type = 'radio'
-                    name = "type_of_user"
-                    value = '1'
-                    component = {this.renderField}
-                /><label>Hire</label>
+        return (<div className="container">
+                <div className="row">
+                    <div className="col-sm-4"></div>
+                    <div className="col-sm-4">
+                        <div className="row">
+                            <img src="../../style/freelancer.png" alt=""/>
+                        </div>
+                        <div className="row"><hr className="someClass"/></div>
+                        <div className="row">
+                            <div className="col-sm-2"></div>
+                            <div className="col-sm-8">
+                                <h5>Sign Up for <em>free</em>today</h5></div>
+                            </div>
+                            <div className="col-sm-2"></div>
+                        <div className="row"><hr className="someClass"/></div>
+                        <div className="row">
+                            <form className="row" onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+                                <div className="col-sm-12">
+                                <Field
+                                    hint = 'Name'
+                                    type = 'text'
+                                    name = "name"
+                                    component = {this.renderField}
+                                />
+                                </div>
+                                <div className="col-sm-12">
+                                <Field
+                                hint = 'Email Address'
+                                type = 'email'
+                                name = "emailid"
+                                component = {this.renderField}
+                                />
+                                </div>
+                                <div className="col-sm-12">
+                                <Field
+                                hint = 'Password'
+                                type = 'password'
+                                name = "password"
+                                component = {this.renderField}
+                                />
+                                </div>
+                                <div className="container">
+                                <div className="row">
+                                    <div className="col-sm-6">
+                                        <button type='submit' className='btn btn-primary'>Submit</button>
+                                    </div>
+                                    <div className="col-sm-6">
+                                        <Link to='/' className='btn btn-danger'>Cancel</Link>
+                                    </div>
+                                </div>
+                                </div>
+                                <div className="row text-danger" id="message"></div>
+                            </form>
+                        </div>
+                    </div>
+                    <div className="col-sm-4"></div>
                 </div>
-                <div className='btn btn-secondary'><label>
-                <Field
-                    hint = ''
-                    type = 'radio'
-                    name = "type_of_user"
-                    value = '0'
-                    component = {this.renderField}
-                />{' '} Work</label>
-                </div>*/}
-                <button type='submit' className='btn btn-primary'>Submit</button>
-                <Link to='/' className='btn btn-danger'>Cancel</Link>
-                <div id="message"></div>
-            </form>
+            </div>
         );
     }
 }
 
 function validate(values) {
-    //console.log(values);
+    console.log(values);
     const errors = {};
 
     if (!values.name){
         errors.name = 'Please Enter the Name'
+    }else if (values.name.length > 30) {
+        console.log()
+        errors.name = 'Must be 30 characters or less'
+    } else if (values.name.length < 2) {
+        errors.name = 'Must be 2 characters or more'
     }
-    if (!values.emailid){
-        errors.emailid = 'Please Enter the EmailID'
+    if (!values.emailid) {
+        errors.emailid = 'Please Enter your Email Address'
+    }else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.emailid)) {
+        errors.emailid = 'Invalid email address'
     }
     if (!values.password){
         errors.password = 'Please Enter the Password'
+    }  else if(values.password.length < 8 || values.password.length >15){
+        errors.password = "password should be min 8 chars and max 15 chars";
     }
-
-
     return errors;
 }
 export default reduxForm({

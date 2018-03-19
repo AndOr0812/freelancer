@@ -41,9 +41,25 @@ export function getImages() {
 }
 
 
-export function getUserProfile(emailId) {
+export function getUserProfile(emailId,callback) {
     console.log(`The emailId for which the profile should be fetched is ${emailId}`);
-    const request = axios.post(`${ROOT_URL}/users/profile/getdetails/`)
+    const request = axios.get(`${ROOT_URL}/users/profile/getdetails/${emailId}`,{withCredentials: true});
+
+    return (dispatch) => {
+        request.then(
+            ({data}) => {
+                console.log("Inside the profile update dispatcher function");
+                console.log(data);
+                callback(data);
+                if (data.success) {
+                    callback(data.user_profile);
+                    dispatch({
+                        type: GET_PROFILE_DETAILS,
+                        payload: data.user_profile
+                    });
+                }
+            }
+        )};
 }
 //Action Creator for the Login Page
 export function profileUpdate(values,callback) {
@@ -140,6 +156,7 @@ export function authenticateUser(values,callback) {
                 console.log(data);
                 callback(data);
                 if (data.success) {
+                    getUserProfile(data.user.details.emailid);
                     dispatch({
                         type: AUTHENTICATE_USER,
                         payload: data

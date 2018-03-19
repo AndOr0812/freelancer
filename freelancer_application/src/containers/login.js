@@ -32,7 +32,7 @@ class Login extends Component {
                     placeholder= {field.hint}
                     {...field.input}
                 />
-                <div className='text-help'>
+                <div className='text-danger'>
                     {field.meta.touched ? field.meta.error : ''}
                 </div>
             </div>
@@ -44,8 +44,8 @@ class Login extends Component {
         this.props.authenticateUser(values,(result_user)=>{
             console.log('return from the callback');
             console.log(result_user);
-            if (result_user.error === 'Invalid Email Id and password'){
-                let err_msg = "Invalid Email ID and/or Password";
+            if (result_user.error === 'Invalid Email Id' || result_user.error === 'Invalid password'){
+                let err_msg = result_user.error;
                 document.getElementById("message").innerHTML = err_msg;
             }
         });
@@ -75,7 +75,7 @@ class Login extends Component {
                 <Link to='/' className='btn btn-danger'>Cancel</Link>
 
             </form>
-                <div id="message"> </div>
+                <div className='text-danger' id="message"> </div>
 {/*                <Modal>
                     <BrowserRouter>
                         <Signup />

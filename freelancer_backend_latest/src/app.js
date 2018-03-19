@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import sessions from "client-sessions";
 /*var cors = require('cors');*/
 var path = require('path');
+import bcrypt from 'bcrypt';
 //var favicon = require('serve-favicon');
 
 import index from './routes/index';
